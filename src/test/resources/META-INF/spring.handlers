@@ -1,0 +1,2 @@
+http\://www.foo.com/schema/component=com.foo.ComponentNamespaceHandler
+http\://www.haohao.com/schema/user=com.haohao.handler.UserHandler
