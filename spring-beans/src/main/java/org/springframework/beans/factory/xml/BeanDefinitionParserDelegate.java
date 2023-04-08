@@ -1384,6 +1384,7 @@ public class BeanDefinitionParserDelegate {
 	 * @return the resulting bean definition
 	 */
 	@Nullable
+	//又嵌套了一层，解析自定义标签！
 	public BeanDefinition parseCustomElement(Element ele) {
 		return parseCustomElement(ele, null);
 	}
@@ -1395,16 +1396,20 @@ public class BeanDefinitionParserDelegate {
 	 * @return the resulting bean definition
 	 */
 	@Nullable
+	//到这里了
 	public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
+		//解析URI，也就是获得<xsi:schemaLocation="http://www.springframework.org/schema/user">的后面这一串
 		String namespaceUri = getNamespaceURI(ele);
 		if (namespaceUri == null) {
 			return null;
 		}
+		//根据URI获取handler，这个方法读取的是spring.handlers这个文件
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
 			return null;
 		}
+		//之后再根据这个handler找到parser，再进行解析
 		return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
 	}
 
