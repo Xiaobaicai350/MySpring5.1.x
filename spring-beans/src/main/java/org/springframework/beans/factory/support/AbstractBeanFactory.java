@@ -356,7 +356,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					//得到单例对象方法，进去
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
-							//那个第二步就是干这个的：创建对象的方法，进去看看
+							//那个第二步就是干这个的：创建对象的方法，进去看看！！
 							return createBean(beanName, mbd, args);
 						}
 						catch (BeansException ex) {

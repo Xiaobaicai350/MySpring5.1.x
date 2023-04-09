@@ -172,6 +172,7 @@ public abstract class BeanUtils {
 		try {
 			ReflectionUtils.makeAccessible(ctor);
 			return (KotlinDetector.isKotlinReflectPresent() && KotlinDetector.isKotlinType(ctor.getDeclaringClass()) ?
+					//这里的ctor.newInstance(args)就是创建对象了
 					KotlinDelegate.instantiateClass(ctor, args) : ctor.newInstance(args));
 		}
 		catch (InstantiationException ex) {

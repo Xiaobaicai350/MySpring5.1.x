@@ -58,6 +58,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 
 
 	@Override
+	//这里
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
 		// Don't override the class with CGLIB if no overrides.
 		if (!bd.hasMethodOverrides()) {
@@ -84,6 +85,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 					}
 				}
 			}
+			//这个方法底层使用反射以构造器的方法创建bean对象并且返回！
 			return BeanUtils.instantiateClass(constructorToUse);
 		}
 		else {
