@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xmlns:haohao="http://www.haohao.com/schema/user"
+	   xmlns:haohao="http://www.haohao.com/schema/user" xmlns:aop="http://www.springframework.org/schema/aop"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
 						   http://www.springframework.org/schema/beans/spring-beans.xsd
 						   http://www.haohao.com/schema/user
-						   http://www.haohao.com/schema/user.xsd">
+						   http://www.haohao.com/schema/user.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
 
-	<bean id="user" class="com.haohao.Entity.User" />
-	<haohao:user id="u" name="haohao" password="123"/>
+<!--	<bean id="user" class="com.haohao.Entity.User" />-->
+<!--	<haohao:user id="u" name="haohao" password="123"/>-->
+	<bean id="userService" class="com.haohao.service.UserServiceImpl"/>
+	<bean id="before" class="com.haohao.aop.Before"/>
+
+	<aop:config>
+		<aop:advisor advice-ref="before" pointcut="execution(* com.haohao.service.UserServiceImpl.*(..))"/>
+	</aop:config>
 </beans>

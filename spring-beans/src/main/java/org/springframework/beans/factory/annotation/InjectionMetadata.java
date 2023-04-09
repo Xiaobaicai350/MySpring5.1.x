@@ -77,16 +77,19 @@ public class InjectionMetadata {
 		}
 		this.checkedElements = checkedElements;
 	}
-
+	//到这里了
 	public void inject(Object target, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
 		Collection<InjectedElement> checkedElements = this.checkedElements;
 		Collection<InjectedElement> elementsToIterate =
 				(checkedElements != null ? checkedElements : this.injectedElements);
 		if (!elementsToIterate.isEmpty()) {
+			//这的element就是对bean中的属性进行一个一个封装
 			for (InjectedElement element : elementsToIterate) {
 				if (logger.isTraceEnabled()) {
 					logger.trace("Processing injected element of bean '" + beanName + "': " + element);
 				}
+				//这里是真正封装的行为！
+				//强制进入第一个
 				element.inject(target, beanName, pvs);
 			}
 		}
@@ -175,6 +178,7 @@ public class InjectionMetadata {
 				throws Throwable {
 
 			if (this.isField) {
+				//字段名称
 				Field field = (Field) this.member;
 				ReflectionUtils.makeAccessible(field);
 				field.set(target, getResourceToInject(target, requestingBeanName));

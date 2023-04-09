@@ -420,10 +420,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	@Override
+	//到了这里
 	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)
 			throws BeansException {
 
 		Object result = existingBean;
+		//注意，这里面可能有多个BeanPostProcessor，
+		// 但是实现代理功能的BeanPostProcessor是{AspectJAwareAdvisorAutoProxyCreator@1848}的时候就会变成代理对象
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
 			Object current = processor.postProcessAfterInitialization(result, beanName);
 			if (current == null) {
@@ -1428,8 +1431,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
-					//注解的实行是基于BeanPostProcessor的。。
+					//注解的实行是基于BeanPostProcessor的。。这行代码是执行的核心
+					//当bp等于AutoWiredAnnotationBeanPostProcessor的时候会执行这个
 					InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
+					//等于AutoWiredAnnotationBeanPostProcessor的时候会进行转换。。
+					//进去看看
 					PropertyValues pvsToUse = ibp.postProcessProperties(pvs, bw.getWrappedInstance(), beanName);
 					if (pvsToUse == null) {
 						if (filteredPds == null) {
@@ -1714,9 +1720,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 				//这个得到的是属性的名称也就是“id”
 				String propertyName = pv.getName();
-				//这个得到的是属性的值，不过这个类型是TypeStringValue（这个对象应该是Spring的规范，是对数据value的包装），不过还是一个对象，不是字符串
+				//这个得到的是属性的值（也不算，是一个spring的对象），
+				//如果是JDK的数据类型的话：这个类型是TypeStringValue（这个对象应该是Spring的规范，是对数据value的包装），
+				//如果是自己定义的引用数据类型的话，这个类型是RuntimeBeanReference。
+				// 不过还是一个对象，不是字符串
 				Object originalValue = pv.getValue();
 				//这里取到了真正的值，“1”，但是还没有使用转换器转换类型
+				//但是如果这里的值还没有被创建，也就是说成员变量是我们自己写的引用数据类型，就会去容器里面找这个bean....创建这个bean。其实都是一样的流程
 				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
 				Object convertedValue = resolvedValue;
 				//这里是判断变量不能被final修饰...等等
@@ -1808,15 +1818,18 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}, getAccessControlContext());
 		}
 		else {
+			//aware
 			invokeAwareMethods(beanName, bean);
 		}
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
+			//BeanPostProcessorsBefore
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		try {
+			//init
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
 		catch (Throwable ex) {
@@ -1825,6 +1838,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					beanName, "Invocation of init method failed", ex);
 		}
 		if (mbd == null || !mbd.isSynthetic()) {
+			//BeanPostProcessorsAfter
+			//代理对象也是在这创建的，spring把代理对象的创建放在了最后一个步骤！！
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 

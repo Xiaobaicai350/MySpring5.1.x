@@ -113,6 +113,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * @see #postProcessPropertyValues
 	 */
 	@Nullable
+	//选择AutoWiredAnnotationBeanPostProcessor
 	default PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName)
 			throws BeansException {
 

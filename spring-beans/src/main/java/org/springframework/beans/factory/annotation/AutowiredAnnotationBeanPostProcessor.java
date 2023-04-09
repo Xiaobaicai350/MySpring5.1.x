@@ -371,8 +371,12 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 	@Override
 	public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
+		//这里面存储的是关于注入的信息，包括value和autowired！！！
+		//注意，这里只获取了需要注入的属性！！也就是找到了哪个属性需要注入！
 		InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
 		try {
+//			真正完成注解的处理的其实是这行代码！
+			//进入看看
 			metadata.inject(bean, beanName, pvs);
 		}
 		catch (BeanCreationException ex) {
@@ -580,6 +584,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 		@Override
 		protected void inject(Object bean, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
+			//这里面的字段和bean的字段相照应
 			Field field = (Field) this.member;
 			Object value;
 			if (this.cached) {
@@ -592,6 +597,9 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 				Assert.state(beanFactory != null, "No BeanFactory available");
 				TypeConverter typeConverter = beanFactory.getTypeConverter();
 				try {
+					//这里获得的就是字段的值！
+					//怎么获取的呢？？？进去看看
+					//这里面涉及到了解析
 					value = beanFactory.resolveDependency(desc, beanName, autowiredBeanNames, typeConverter);
 				}
 				catch (BeansException ex) {
@@ -620,6 +628,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 			}
 			if (value != null) {
 				ReflectionUtils.makeAccessible(field);
+				//反射给字段赋值
 				field.set(bean, value);
 			}
 		}

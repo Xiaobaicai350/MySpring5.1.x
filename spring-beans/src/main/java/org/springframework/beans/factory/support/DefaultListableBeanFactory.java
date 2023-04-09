@@ -1225,6 +1225,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			Object value = getAutowireCandidateResolver().getSuggestedValue(descriptor);
 			if (value != null) {
 				if (value instanceof String) {
+					//这里是得到值了已经，这个要进去看，里面通过${xxx}得到properties文件的真正值
 					String strVal = resolveEmbeddedValue((String) value);
 					BeanDefinition bd = (beanName != null && containsBean(beanName) ?
 							getMergedBeanDefinition(beanName) : null);
