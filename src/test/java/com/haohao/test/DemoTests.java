@@ -11,7 +11,9 @@ import org.junit.Test;
 public class DemoTests {
 	@Test
 	public void test1(){
+		//读取xml配置文件，并且把bean封装成BF，之后再在spring的容器中注册
 		XmlBeanFactory beanFactory = new XmlBeanFactory(new ClassPathResource("applicationContext.xml"));
+		//创建bean对象，并且得到这个bean对象，需要注意的是bean的创建是懒惰的，调用的时候才会创建
 		Object bean = beanFactory.getBean("user");
 		System.err.println(bean);
 	}

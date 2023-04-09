@@ -164,7 +164,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	@Override
 	@Nullable
+	//又是熟悉的重载
 	public Object getSingleton(String beanName) {
+		//得到单实例bean
 		return getSingleton(beanName, true);
 	}
 
@@ -177,20 +179,26 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @return the registered singleton object, or {@code null} if none found
 	 */
 	@Nullable
+	//得到这个单例bean
+
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
-		// Quick check for existing instance without full singleton lock
+		//从一级缓存singletonObjects中取这个对象，如果没取到，就去二级缓存中取
 		Object singletonObject = this.singletonObjects.get(beanName);
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+			//从二级缓存earlySingletonObjects中取这个对象，如果没取到，就去三级缓存中取
 			singletonObject = this.earlySingletonObjects.get(beanName);
+			//从这里，开始加安全性校验，加锁！
 			if (singletonObject == null && allowEarlyReference) {
 				synchronized (this.singletonObjects) {
-					// Consistent creation of early reference within full singleton lock
 					singletonObject = this.singletonObjects.get(beanName);
 					if (singletonObject == null) {
 						singletonObject = this.earlySingletonObjects.get(beanName);
 						if (singletonObject == null) {
+							//从三级缓存singletonFactories中取这个对象
+							//你可能会问，为什么要设置这三级缓存，因为可以解决循环引用问题！！！这个后面会细讲！
 							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 							if (singletonFactory != null) {
+								//后面这三个还没讲。
 								singletonObject = singletonFactory.getObject();
 								this.earlySingletonObjects.put(beanName, singletonObject);
 								this.singletonFactories.remove(beanName);
@@ -211,11 +219,17 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * with, if necessary
 	 * @return the registered singleton object
 	 */
+	//到了这里，
+	//Spring中创建单例使用的是一种基于内部类的懒加载实现方式，也称为Holder模式。
+	//这种方式的核心思想是将实例化的逻辑放在内部类中，利用Java类加载机制实现懒加载并保证线程安全。
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(beanName, "Bean name must not be null");
+		//加了把锁，但是为啥不弄双重检查锁
 		synchronized (this.singletonObjects) {
+			//再次确认这个单例池里面没有这个对象
 			Object singletonObject = this.singletonObjects.get(beanName);
 			if (singletonObject == null) {
+				//下面的也是安全性校验
 				if (this.singletonsCurrentlyInDestruction) {
 					throw new BeanCreationNotAllowedException(beanName,
 							"Singleton bean creation not allowed while singletons of this factory are in destruction " +
@@ -224,6 +238,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
+				//1.这个是创建单例之前的检查，具体检查啥可以进去看
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -231,6 +246,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
+					//2.
 					singletonObject = singletonFactory.getObject();
 					newSingleton = true;
 				}
@@ -256,6 +272,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					}
 					afterSingletonCreation(beanName);
 				}
+				//3.
 				if (newSingleton) {
 					addSingleton(beanName, singletonObject);
 				}
@@ -351,6 +368,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @see #isSingletonCurrentlyInCreation
 	 */
 	protected void beforeSingletonCreation(String beanName) {
+		//1.这个bean没有被排除
+		//2.这个bean正在创建中
+
+		//这个排除列表和正在创建中的特性，就是解决循环依赖的关键
 		if (!this.inCreationCheckExclusions.contains(beanName) && !this.singletonsCurrentlyInCreation.add(beanName)) {
 			throw new BeanCurrentlyInCreationException(beanName);
 		}

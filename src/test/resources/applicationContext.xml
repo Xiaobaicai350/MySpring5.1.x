@@ -7,6 +7,6 @@
 						   http://www.haohao.com/schema/user
 						   http://www.haohao.com/schema/user.xsd">
 
-<!--	<bean id="user" class="com.haohao.Entity.User"/>-->
+	<bean id="user" class="com.haohao.Entity.User" />
 	<haohao:user id="u" name="haohao" password="123"/>
 </beans>
