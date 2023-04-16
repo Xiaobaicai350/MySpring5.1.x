@@ -43,6 +43,9 @@ public class DemoTests {
 	//测试注解自动注入bean和set注入
 	@Test
 	public void test4(){
+		//到这里调用了构造方法，读取了配置文件
+		//这个工厂是一个加强版的beanFactory
+		//进里面看看
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(MyAnnotationConfig.class);
 		Object product = ctx.getBean("product");
 		System.err.println("product = " + product);
@@ -54,6 +57,7 @@ public class DemoTests {
 		UserServiceImpl userService = (UserServiceImpl) c.getBean("userService");
 		userService.register();
 	}
+
 
 
 }

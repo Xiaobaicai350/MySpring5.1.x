@@ -84,7 +84,12 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
+		//这里调用了AnnotationConfigApplicationContext的无参构造，这个无参构造里面new了两个对象
+		//	一个reader。
+		//  一个scanner。
 		this();
+		//new上面两个对象的目的就是为了在register中使用。
+		// 这里对配置文件中的对象进行注册
 		register(componentClasses);
 		refresh();
 	}
